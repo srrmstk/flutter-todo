@@ -25,6 +25,8 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
         ),
       ),
     );
+
+    Navigator.pop(context);
   }
 
   @override
