@@ -6,34 +6,11 @@ part 'todo_list_event.dart';
 part 'todo_list_state.dart';
 
 class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
-  TodoListBloc()
-      : super(TodoListState([
-          TodoItem(
-            title: 'jopa',
-            date: DateTime.now(),
-          ),
-          TodoItem(
-            title: 'jopa',
-            date: DateTime.now(),
-          ),
-          TodoItem(
-            title: 'jopa',
-            date: DateTime.now(),
-          ),
-          TodoItem(
-            title: 'jopa',
-            date: DateTime.now(),
-          ),
-          TodoItem(
-            title: 'jopa',
-            date: DateTime.now(),
-          ),
-        ])) {
+  TodoListBloc() : super(TodoListState(todoList: [])) {
     on<TodoListItemAdded>((event, emit) {
-      final newTodoList = state.todoList;
-      newTodoList.add(event.todoItem);
+      final todoList = state.todoList..add(event.todoItem);
 
-      emit(TodoListState(newTodoList));
+      emit(state.copyWith(todoList: todoList));
     });
   }
 }

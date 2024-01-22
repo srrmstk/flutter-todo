@@ -22,12 +22,16 @@ class HomePage extends StatelessWidget {
       ),
       body: BlocBuilder<TodoListBloc, TodoListState>(
         builder: (context, state) {
-          return ListView(
-            children: state.todoList
-                .map((e) => ListTile(
-                      title: Text(e.title),
-                    ))
-                .toList(),
+          return ListView.separated(
+            itemCount: state.todoList.length,
+            itemBuilder: (context, index) => ListTile(
+              title: Text(
+                state.todoList[index].title,
+              ),
+            ),
+            separatorBuilder: (context, index) => const Divider(
+              height: 4,
+            ),
           );
         },
       ),

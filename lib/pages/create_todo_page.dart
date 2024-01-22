@@ -30,6 +30,14 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
   }
 
   @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _dateController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -47,6 +55,7 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: TextField(
+                      onTapOutside: (event) => FocusScope.of(context).unfocus(),
                       controller: _titleController,
                       decoration: const InputDecoration(
                         hintText: 'Название',
