@@ -8,3 +8,9 @@ class TodoListItemAdded extends TodoListEvent {
 
   final TodoItem todoItem;
 }
+
+class TodoListItemDeleted extends TodoListEvent {
+  TodoListItemDeleted(this.id);
+
+  final String id;
+}

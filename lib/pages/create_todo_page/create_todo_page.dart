@@ -1,6 +1,8 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo/modules/todo/bloc/todo_list_bloc.dart';
+import 'package:todo/modules/todo/cubit/todo_list_cubit.dart';
 import 'package:todo/modules/todo/models/todo_item.dart';
 
 class CreateTodoPage extends StatefulWidget {
@@ -16,17 +18,29 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
   final _dateController = TextEditingController();
 
   void _onTodoCreate() {
-    BlocProvider.of<TodoListBloc>(context).add(
-      TodoListItemAdded(
-        TodoItem(
-          title: _titleController.text,
-          description: _descriptionController.text,
-          date: DateTime.now(),
-        ),
-      ),
-    );
+    context.read<TodoListCubit>().addTodo(
+          TodoItem(
+            title: _titleController.text,
+            description: _descriptionController.text,
+            date: DateTime.now(),
+          ),
+        );
 
     Navigator.pop(context);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    int slowFib(int n) => n <= 1 ? 1 : slowFib(n - 1) + slowFib(n - 2);
+
+    // Compute without blocking current isolate.
+    void fib40() async {
+      var result = await Isolate.run(() => slowFib(40));
+      print('Fib(40) = $result');
+    }
+
+    fib40();
   }
 
   @override
