@@ -5,7 +5,8 @@ class TodoItem {
     required this.title,
     required this.date,
     this.description,
-  }) : id = const Uuid().v4();
+    String? id,
+  }) : id = id ?? const Uuid().v4();
 
   final String id;
   String title;
