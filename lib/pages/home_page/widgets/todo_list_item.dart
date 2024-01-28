@@ -9,17 +9,26 @@ class TodoListItem extends StatelessWidget {
     required this.todoItem,
     required this.onEdit,
     required this.onDelete,
+    required this.onDoneChange,
   });
 
   final TodoItem todoItem;
   final Function(String) onEdit;
   final Function(String) onDelete;
+  final Function(String) onDoneChange;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.only(left: 16),
+      horizontalTitleGap: 0,
+      contentPadding: EdgeInsets.zero,
       title: Text(todoItem.title),
+      leading: Checkbox(
+        value: todoItem.isDone,
+        onChanged: (value) {
+          onDoneChange(todoItem.id);
+        },
+      ),
       trailing: PopupMenuButton(
         onSelected: (MenuItem item) {
           switch (item) {

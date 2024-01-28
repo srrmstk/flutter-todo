@@ -20,33 +20,44 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
 
   late final TodoItem? _currentTodo;
 
+  late final TodoListCubit cubit;
+
+  void _onSave() {
+    if (widget.currentTodoId == null) {
+      _onTodoCreate();
+    } else {
+      _onTodoEdit();
+    }
+  }
+
   void _onTodoCreate() {
-    context.read<TodoListCubit>().addTodo(
-          TodoItem(
-            title: _titleController.text,
-            description: _descriptionController.text,
-            date: DateTime.tryParse(_dateController.text) ?? DateTime.now(),
-          ),
-        );
+    cubit.addTodo(
+      TodoItem(
+        title: _titleController.text,
+        description: _descriptionController.text,
+        date: DateTime.tryParse(_dateController.text) ?? DateTime.now(),
+      ),
+    );
 
     _pop();
   }
 
   void _onTodoEdit() {
-    context.read<TodoListCubit>().editTodo(
-          TodoItem(
-            id: _currentTodo?.id,
-            title: _titleController.text,
-            description: _descriptionController.text,
-            date: DateTime.tryParse(_dateController.text) ?? DateTime.now(),
-          ),
-        );
+    cubit.editTodo(
+      TodoItem(
+        id: _currentTodo?.id,
+        title: _titleController.text,
+        description: _descriptionController.text,
+        date: DateTime.tryParse(_dateController.text) ?? DateTime.now(),
+        isDone: _currentTodo?.isDone,
+      ),
+    );
 
     _pop();
   }
 
   void _pop() {
-    context.read<TodoListCubit>().setCurrentTodo(null);
+    cubit.setCurrentTodo(null);
     AppNavigator.instance.pop();
   }
 
@@ -65,11 +76,12 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
     //
     // fib40();
 
+    cubit = context.read<TodoListCubit>();
+
     if (widget.currentTodoId != null) {
-      context.read<TodoListCubit>().getTodoById(widget.currentTodoId);
+      cubit.getTodoById(widget.currentTodoId);
 
-      _currentTodo = context.read<TodoListCubit>().state.currentTodo;
-
+      _currentTodo = cubit.state.currentTodo;
       _titleController.text = _currentTodo?.title ?? '';
       _descriptionController.text = _currentTodo?.description ?? '';
       _dateController.text = _currentTodo?.date.toString() ?? '';
@@ -134,8 +146,7 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
                 ),
               ),
               ElevatedButton(
-                onPressed:
-                    widget.currentTodoId == null ? _onTodoCreate : _onTodoEdit,
+                onPressed: _onSave,
                 child: const Text('Сохранить'),
               )
             ],
