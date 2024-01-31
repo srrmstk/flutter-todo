@@ -11,8 +11,10 @@ import 'package:todo/navigation/router.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final isar = await Isar.open([TodoSchema],
-      directory: (await getApplicationDocumentsDirectory()).path);
+  final isar = await Isar.open(
+    [TodoSchema],
+    directory: (await getApplicationDocumentsDirectory()).path,
+  );
 
   GetIt.instance.registerSingleton(isar);
 

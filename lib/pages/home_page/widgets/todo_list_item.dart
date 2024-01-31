@@ -5,17 +5,17 @@ enum MenuItem { edit, delete }
 
 class TodoListItem extends StatelessWidget {
   const TodoListItem({
-    super.key,
     required this.todoItem,
     required this.onEdit,
     required this.onDelete,
     required this.onDoneChange,
+    super.key,
   });
 
   final TodoItem todoItem;
-  final Function(String) onEdit;
-  final Function(String) onDelete;
-  final Function(String) onDoneChange;
+  final void Function(String) onEdit;
+  final void Function(String) onDelete;
+  final void Function(String) onDoneChange;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class TodoListItem extends StatelessWidget {
         alignment: Alignment.centerRight,
         color: Colors.red,
         child: const Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16),
           child: Icon(
             Icons.delete,
             color: Colors.white,

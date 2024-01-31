@@ -6,10 +6,12 @@ part 'todo_list_state.dart';
 
 class TodoListCubit extends Cubit<TodoListCubitState> {
   TodoListCubit()
-      : super(TodoListCubitState(
-          todoList: [],
-          isLoading: false,
-        ));
+      : super(
+          TodoListCubitState(
+            todoList: [],
+            isLoading: false,
+          ),
+        );
 
   final TodoService todoService = TodoService();
 
@@ -20,21 +22,21 @@ class TodoListCubit extends Cubit<TodoListCubitState> {
     emit(state.copyWith(todoList: todoList, isLoading: false));
   }
 
-  addTodo(TodoItem item) async {
+  Future<void> addTodo(TodoItem item) async {
     final todoList = state.todoList..add(item);
 
     await todoService.putTodo(item);
     emit(state.copyWith(todoList: todoList));
   }
 
-  deleteTodo(String id) async {
+  Future<void> deleteTodo(String id) async {
     final todoList = state.todoList..removeWhere((element) => element.id == id);
 
     await todoService.deleteTodo(id);
     emit(state.copyWith(todoList: todoList));
   }
 
-  editTodo(TodoItem item) async {
+  Future<void> editTodo(TodoItem item) async {
     final index = state.todoList.indexWhere((todo) => todo.id == item.id);
 
     if (index == -1) {
@@ -48,25 +50,27 @@ class TodoListCubit extends Cubit<TodoListCubitState> {
     emit(state.copyWith(todoList: todoList));
   }
 
-  reorderTodo(int from, int to) async {
-    if (from < to) {
-      to -= 1;
+  Future<void> reorderTodo(int from, int to) async {
+    var localTo = to;
+
+    if (from < localTo) {
+      localTo -= 1;
     }
 
     final todoList = state.todoList;
     final element = todoList.removeAt(from);
-    todoList.insert(to, element);
+    todoList.insert(localTo, element);
 
     await todoService.reorderTodo();
     emit(state.copyWith(todoList: todoList));
   }
 
-  getTodoById(String? id) {
+  void getTodoById(String? id) {
     final todo = state.todoList.firstWhere((todo) => todo.id == id);
     setCurrentTodo(todo);
   }
 
-  setCurrentTodo(TodoItem? todo) {
+  void setCurrentTodo(TodoItem? todo) {
     emit(state.copyWith(currentTodo: todo));
   }
 }

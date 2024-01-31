@@ -11,9 +11,9 @@ class TodoService {
   Future<List<TodoItem>> initTodoList() async {
     final collection = await isar.todos.where().findAll();
 
-    List<TodoItem> res = [];
+    final res = <TodoItem>[];
 
-    for (var e in collection) {
+    for (final e in collection) {
       res.add(TodoItem.fromIsar(e));
     }
 

@@ -1,15 +1,15 @@
 part of 'todo_list_cubit.dart';
 
 class TodoListCubitState {
-  final List<TodoItem> todoList;
-  final TodoItem? currentTodo;
-  final bool isLoading;
-
   TodoListCubitState({
     required this.todoList,
     required this.isLoading,
     this.currentTodo,
   });
+
+  final List<TodoItem> todoList;
+  final TodoItem? currentTodo;
+  final bool isLoading;
 
   TodoListCubitState copyWith({
     List<TodoItem>? todoList,

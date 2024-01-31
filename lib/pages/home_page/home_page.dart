@@ -6,39 +6,44 @@ import 'package:todo/navigation/router.dart';
 import 'package:todo/navigation/screen_names.dart';
 import 'package:todo/pages/home_page/widgets/todo_list_item.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late final TodoListCubit _cubit;
+
   void _onEdit(String id) {
-    _handleNavigation(ScreenNames.createPage, {
-      'id': id,
-    });
+    _handleNavigation(ScreenNames.createPage, {'id': id});
   }
 
-  void _onDelete(String id, TodoListCubit cubit) {
-    cubit.deleteTodo(id);
-    // BlocProvider.of<TodoListBloc>(context).add(TodoListItemDeleted(id));
+  void _onDelete(String id) {
+    _cubit.deleteTodo(id);
   }
 
-  void _onDoneChange(String id, TodoListCubit cubit) {
-    final itemToChange = cubit.state.todoList.firstWhere((e) => e.id == id);
+  void _onDoneChange(String id) {
+    final itemToChange = _cubit.state.todoList.firstWhere((e) => e.id == id);
 
-    cubit.editTodo(
+    _cubit.editTodo(
       TodoItem(
-          id: itemToChange.id,
-          title: itemToChange.title,
-          description: itemToChange.description,
-          date: itemToChange.date,
-          isDone: !itemToChange.isDone),
+        id: itemToChange.id,
+        title: itemToChange.title,
+        description: itemToChange.description,
+        date: itemToChange.date,
+        isDone: !itemToChange.isDone,
+      ),
     );
   }
 
-  Future<void> _onRefresh(TodoListCubit cubit) async {
-    await cubit.initTodoList();
+  Future<void> _onRefresh() async {
+    await _cubit.initTodoList();
   }
 
-  void _onReorder(int from, int to, TodoListCubit cubit) async {
-    await cubit.reorderTodo(from, to);
+  Future<void> _onReorder(int from, int to) async {
+    await _cubit.reorderTodo(from, to);
   }
 
   void _handleNavigation(String routeName, Map<String, dynamic>? args) {
@@ -46,14 +51,17 @@ class HomePage extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final TodoListCubit cubit = BlocProvider.of<TodoListCubit>(context)
-      ..initTodoList();
+  void initState() {
+    super.initState();
+    _cubit = BlocProvider.of<TodoListCubit>(context)..initTodoList();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Список дел'),
+        title: const Text('Todo List'),
         actions: [
           IconButton(
             onPressed: () => _handleNavigation(ScreenNames.createPage, null),
@@ -63,24 +71,25 @@ class HomePage extends StatelessWidget {
       ),
       body: SafeArea(
         child: BlocBuilder<TodoListCubit, TodoListCubitState>(
-          bloc: cubit,
+          bloc: _cubit,
           builder: (context, state) {
             return Column(
               children: [
-                state.isLoading
-                    ? const LinearProgressIndicator(minHeight: 4)
-                    : const SizedBox(height: 4),
+                if (state.isLoading)
+                  const LinearProgressIndicator(minHeight: 4)
+                else
+                  const SizedBox(height: 4),
                 Expanded(
                   child: RefreshIndicator(
-                    onRefresh: () => _onRefresh(cubit),
+                    onRefresh: _onRefresh,
                     child: ReorderableListView.builder(
-                      onReorder: (from, to) => _onReorder(from, to, cubit),
+                      onReorder: _onReorder,
                       itemCount: state.todoList.length,
                       itemBuilder: (context, index) => TodoListItem(
                         key: ValueKey(index),
-                        onEdit: (id) => _onEdit(id),
-                        onDelete: (id) => _onDelete(id, cubit),
-                        onDoneChange: (id) => _onDoneChange(id, cubit),
+                        onEdit: _onEdit,
+                        onDelete: _onDelete,
+                        onDoneChange: _onDoneChange,
                         todoItem: state.todoList[index],
                       ),
                     ),

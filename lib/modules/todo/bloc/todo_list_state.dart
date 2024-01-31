@@ -1,9 +1,9 @@
 part of 'todo_list_bloc.dart';
 
 class TodoListState {
-  final List<TodoItem> todoList;
-
   TodoListState({required this.todoList});
+
+  final List<TodoItem> todoList;
 
   TodoListState copyWith({
     List<TodoItem>? todoList,

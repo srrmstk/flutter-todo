@@ -21,15 +21,15 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
 
   late final TodoItem? _currentTodo;
 
-  late final TodoListCubit cubit;
+  late final TodoListCubit _cubit;
 
   // @TODO: fix date picker layout
   void _showDatePickerDialog(BuildContext context) {
-    DateTime selectedDate = _dateController.text.isNotEmpty
+    var selectedDate = _dateController.text.isNotEmpty
         ? DateTime.parse(_dateController.text)
         : DateTime.now();
 
-    showDialog(
+    showDialog<Widget>(
       context: context,
       builder: (context) => AlertDialog(
         content: SizedBox(
@@ -70,7 +70,7 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
   }
 
   void _onTodoCreate() {
-    cubit.addTodo(
+    _cubit.addTodo(
       TodoItem(
         title: _titleController.text,
         description: _descriptionController.text,
@@ -82,7 +82,7 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
   }
 
   void _onTodoEdit() {
-    cubit.editTodo(
+    _cubit.editTodo(
       TodoItem(
         id: _currentTodo?.id,
         title: _titleController.text,
@@ -96,7 +96,7 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
   }
 
   void _pop() {
-    cubit.setCurrentTodo(null);
+    _cubit.setCurrentTodo(null);
     AppNavigator.instance.pop();
   }
 
@@ -115,12 +115,12 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
     //
     // fib40();
 
-    cubit = context.read<TodoListCubit>();
+    _cubit = context.read<TodoListCubit>();
 
     if (widget.currentTodoId != null) {
-      cubit.getTodoById(widget.currentTodoId);
+      _cubit.getTodoById(widget.currentTodoId);
 
-      _currentTodo = cubit.state.currentTodo;
+      _currentTodo = _cubit.state.currentTodo;
       _titleController.text = _currentTodo?.title ?? '';
       _descriptionController.text = _currentTodo?.description ?? '';
       _dateController.text = _currentTodo?.date.toString() ?? '';
@@ -145,7 +145,7 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -190,7 +190,7 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 child: ElevatedButton(
                   onPressed: _onSave,
                   child: const Text('Сохранить'),
