@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo/modules/todo/cubit/todo_list_cubit.dart';
@@ -21,6 +22,44 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
   late final TodoItem? _currentTodo;
 
   late final TodoListCubit cubit;
+
+  // @TODO: fix date picker layout
+  void _showDatePickerDialog(BuildContext context) {
+    DateTime selectedDate = _dateController.text.isNotEmpty
+        ? DateTime.parse(_dateController.text)
+        : DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: SizedBox(
+          height: 200,
+          child: CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            initialDateTime: selectedDate,
+            onDateTimeChanged: (DateTime newDateTime) {
+              selectedDate = newDateTime;
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              _dateController.text = selectedDate.toString();
+              AppNavigator.instance.pop();
+            },
+            child: const Text('Применить'),
+          ),
+          TextButton(
+            onPressed: () {
+              AppNavigator.instance.pop();
+            },
+            child: const Text('Отменить'),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _onSave() {
     if (widget.currentTodoId == null) {
@@ -106,7 +145,7 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -137,18 +176,26 @@ class _CreateTodoPageState extends State<CreateTodoPage> {
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: TextField(
                         controller: _dateController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Дата',
+                          suffixIcon: IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () => _showDatePickerDialog(context),
+                            icon: const Icon(Icons.calendar_month),
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              ElevatedButton(
-                onPressed: _onSave,
-                child: const Text('Сохранить'),
-              )
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: ElevatedButton(
+                  onPressed: _onSave,
+                  child: const Text('Сохранить'),
+                ),
+              ),
             ],
           ),
         ),

@@ -19,37 +19,32 @@ class TodoListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      horizontalTitleGap: 0,
-      contentPadding: EdgeInsets.zero,
-      title: Text(todoItem.title),
-      leading: Checkbox(
-        value: todoItem.isDone,
-        onChanged: (value) {
-          onDoneChange(todoItem.id);
-        },
+    return Dismissible(
+      key: ValueKey(todoItem.id),
+      background: Container(
+        alignment: Alignment.centerRight,
+        color: Colors.red,
+        child: const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Icon(
+            Icons.delete,
+            color: Colors.white,
+          ),
+        ),
       ),
-      trailing: PopupMenuButton(
-        onSelected: (MenuItem item) {
-          switch (item) {
-            case MenuItem.edit:
-              onEdit(todoItem.id);
-            case MenuItem.delete:
-              onDelete(todoItem.id);
-            default:
-              break;
-          }
-        },
-        itemBuilder: (context) => <PopupMenuEntry<MenuItem>>[
-          const PopupMenuItem(
-            value: MenuItem.edit,
-            child: Text('Редактировать'),
-          ),
-          const PopupMenuItem(
-            value: MenuItem.delete,
-            child: Text('Удалить'),
-          ),
-        ],
+      direction: DismissDirection.endToStart,
+      onDismissed: (_) => onDelete(todoItem.id),
+      child: ListTile(
+        onTap: () => onEdit(todoItem.id),
+        horizontalTitleGap: 0,
+        contentPadding: EdgeInsets.zero,
+        title: Text(todoItem.title),
+        leading: Checkbox(
+          value: todoItem.isDone,
+          onChanged: (value) {
+            onDoneChange(todoItem.id);
+          },
+        ),
       ),
     );
   }

@@ -34,6 +34,10 @@ class TodoService {
     });
   }
 
+  Future<void> reorderTodo() async {
+    // @TODO: make reorder logic, e.g. by adding sort field to schema
+  }
+
   Todo _constructTodoSchema(TodoItem todoItem) {
     return Todo()
       ..id = todoItem.id

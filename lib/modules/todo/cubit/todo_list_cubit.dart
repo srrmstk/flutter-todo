@@ -48,6 +48,19 @@ class TodoListCubit extends Cubit<TodoListCubitState> {
     emit(state.copyWith(todoList: todoList));
   }
 
+  reorderTodo(int from, int to) async {
+    if (from < to) {
+      to -= 1;
+    }
+
+    final todoList = state.todoList;
+    final element = todoList.removeAt(from);
+    todoList.insert(to, element);
+
+    await todoService.reorderTodo();
+    emit(state.copyWith(todoList: todoList));
+  }
+
   getTodoById(String? id) {
     final todo = state.todoList.firstWhere((todo) => todo.id == id);
     setCurrentTodo(todo);

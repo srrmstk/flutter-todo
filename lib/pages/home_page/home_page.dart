@@ -6,22 +6,8 @@ import 'package:todo/navigation/router.dart';
 import 'package:todo/navigation/screen_names.dart';
 import 'package:todo/pages/home_page/widgets/todo_list_item.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  late final TodoListCubit cubit;
-
-  @override
-  void initState() {
-    super.initState();
-
-    cubit = BlocProvider.of<TodoListCubit>(context)..initTodoList();
-  }
 
   void _onEdit(String id) {
     _handleNavigation(ScreenNames.createPage, {
@@ -29,12 +15,12 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _onDelete(String id) {
+  void _onDelete(String id, TodoListCubit cubit) {
     cubit.deleteTodo(id);
     // BlocProvider.of<TodoListBloc>(context).add(TodoListItemDeleted(id));
   }
 
-  void _onDoneChange(String id) {
+  void _onDoneChange(String id, TodoListCubit cubit) {
     final itemToChange = cubit.state.todoList.firstWhere((e) => e.id == id);
 
     cubit.editTodo(
@@ -47,8 +33,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _onRefresh() async {
+  Future<void> _onRefresh(TodoListCubit cubit) async {
     await cubit.initTodoList();
+  }
+
+  void _onReorder(int from, int to, TodoListCubit cubit) async {
+    await cubit.reorderTodo(from, to);
   }
 
   void _handleNavigation(String routeName, Map<String, dynamic>? args) {
@@ -57,6 +47,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final TodoListCubit cubit = BlocProvider.of<TodoListCubit>(context)
+      ..initTodoList();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -70,6 +63,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SafeArea(
         child: BlocBuilder<TodoListCubit, TodoListCubitState>(
+          bloc: cubit,
           builder: (context, state) {
             return Column(
               children: [
@@ -78,17 +72,16 @@ class _HomePageState extends State<HomePage> {
                     : const SizedBox(height: 4),
                 Expanded(
                   child: RefreshIndicator(
-                    onRefresh: _onRefresh,
-                    child: ListView.separated(
+                    onRefresh: () => _onRefresh(cubit),
+                    child: ReorderableListView.builder(
+                      onReorder: (from, to) => _onReorder(from, to, cubit),
                       itemCount: state.todoList.length,
                       itemBuilder: (context, index) => TodoListItem(
+                        key: ValueKey(index),
                         onEdit: (id) => _onEdit(id),
-                        onDelete: (id) => _onDelete(id),
-                        onDoneChange: (id) => _onDoneChange(id),
+                        onDelete: (id) => _onDelete(id, cubit),
+                        onDoneChange: (id) => _onDoneChange(id, cubit),
                         todoItem: state.todoList[index],
-                      ),
-                      separatorBuilder: (context, index) => const Divider(
-                        height: 1,
                       ),
                     ),
                   ),
