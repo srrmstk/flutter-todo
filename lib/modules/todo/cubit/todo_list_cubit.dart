@@ -13,27 +13,28 @@ class TodoListCubit extends Cubit<TodoListCubitState> {
           ),
         );
 
-  final TodoService todoService = TodoService();
+  final TodoService _todoService = TodoService();
 
   Future<void> initTodoList() async {
     emit(state.copyWith(isLoading: true));
 
-    final todoList = await todoService.initTodoList();
+    final todoList = await _todoService.initTodoList();
     emit(state.copyWith(todoList: todoList, isLoading: false));
   }
 
   Future<void> addTodo(TodoItem item) async {
     final todoList = state.todoList..add(item);
 
-    await todoService.putTodo(item);
-    emit(state.copyWith(todoList: todoList));
+    await _todoService.putTodo(item);
+    _updateTodoList(todoList);
   }
 
   Future<void> deleteTodo(String id) async {
-    final todoList = state.todoList..removeWhere((element) => element.id == id);
+    final updatedTodoList = state.todoList
+      ..removeWhere((element) => element.id == id);
 
-    await todoService.deleteTodo(id);
-    emit(state.copyWith(todoList: todoList));
+    await _todoService.deleteTodo(id);
+    _updateTodoList(updatedTodoList);
   }
 
   Future<void> editTodo(TodoItem item) async {
@@ -43,26 +44,22 @@ class TodoListCubit extends Cubit<TodoListCubitState> {
       return;
     }
 
-    final todoList = state.todoList;
-    todoList[index] = item;
+    final updatedTodoList = state.todoList;
+    updatedTodoList[index] = item;
 
-    await todoService.putTodo(item);
-    emit(state.copyWith(todoList: todoList));
+    await _todoService.putTodo(item);
+    _updateTodoList(updatedTodoList);
   }
 
   Future<void> reorderTodo(int from, int to) async {
-    var localTo = to;
+    if (from == to) return;
 
-    if (from < localTo) {
-      localTo -= 1;
-    }
+    final updatedTodoList = [...state.todoList];
+    final element = updatedTodoList.removeAt(from);
+    updatedTodoList.insert(to > from ? to - 1 : to, element);
 
-    final todoList = state.todoList;
-    final element = todoList.removeAt(from);
-    todoList.insert(localTo, element);
-
-    await todoService.reorderTodo();
-    emit(state.copyWith(todoList: todoList));
+    await _todoService.reorderTodo();
+    _updateTodoList(updatedTodoList);
   }
 
   void getTodoById(String? id) {
@@ -72,5 +69,9 @@ class TodoListCubit extends Cubit<TodoListCubitState> {
 
   void setCurrentTodo(TodoItem? todo) {
     emit(state.copyWith(currentTodo: todo));
+  }
+
+  void _updateTodoList(List<TodoItem> updatedTodoList) {
+    emit(state.copyWith(todoList: updatedTodoList));
   }
 }
